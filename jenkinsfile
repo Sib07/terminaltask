@@ -1,6 +1,6 @@
 pipeline {
     agent any
- 
+
     stages {
         stage('Build') {
             steps {
@@ -11,7 +11,7 @@ pipeline {
                 }
             }
         }
- 
+
         stage('Test') {
             steps {
                 script {
@@ -21,7 +21,7 @@ pipeline {
                 }
             }
         }
- 
+
         stage('Deploy') {
             steps {
                 script {
@@ -32,18 +32,22 @@ pipeline {
             }
         }
     }
- 
+
     post {
         success {
             echo 'Pipeline succeeded!'
             // Example post-build success actions
-            mail to: 'your-team@example.com', subject: 'Pipeline Succeeded', body: 'The pipeline has succeeded.'
+            emailext subject: "Pipeline Succeeded: ${currentBuild.fullDisplayName}",
+                      body: "The pipeline has succeeded.",
+                      to: "your-team@example.com"
         }
- 
+
         failure {
             echo 'Pipeline failed!'
             // Example post-build failure actions
-            mail to: 'your-team@example.com', subject: 'Pipeline Failed', body: 'The pipeline has failed. Please check the logs.'
+            emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                      body: "The pipeline has failed. Please check the logs.",
+                      to: "your-team@example.com"
         }
     }
 }
