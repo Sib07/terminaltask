@@ -15,9 +15,11 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 script {
-                    checkout([$class: 'GitSCM', branches: [[name: 'main']], userRemoteConfigs: [[url: GIT_REPO_URL]]])
+                    withCredentials([string(credentialsId: '', variable: 'saba7794')]) {
+    // some block
+}
                 }
-            }
+            
         }
 
         stage('Build Docker Image') {
@@ -31,7 +33,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dckr_pat_9-vH-OvulaIIaNccVkIwIGddXI4', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
+                   checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'b4fe048b-564e-4a4f-9506-45aa2d9d9800', url: 'https://github.com/Sib07/terminaltask.git']]) {
                         // Use double quotes for variable substitution
                         bat "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
                         bat "docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPO}:${BUILD_NUMBER}"
