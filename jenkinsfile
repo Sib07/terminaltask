@@ -1,17 +1,21 @@
 pipeline {
     agent any
-    
-    tools {
-        maven 'MAVEN'
+
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('dckr_pat_YU6_kylKj5FAW1bCLSlTir4Qd9A')
+        GIT_REPO_URL = 'https://github.com/Sib07/terminaltask.git'
+        DOCKER_IMAGE_NAME = 'my-web-app'
+        DOCKER_HUB_USERNAME = 'saba7794'
+        DOCKER_HUB_REPO = 'my-web-app'
+        DOCKER_HUB_PASSWORD = 'Hala@7890' // URL encoded password
+        EMAIL_RECIPIENTS = 'fa20-bse-041@cuiatk.edu.pk'
     }
 
     stages {
-        stage('Build Maven') {
+        stage('Clone Repository') {
             steps {
                 script {
-                    checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a3ce9c8d-1f26-4dbd-9fd7-e5c0ac5ae11d', url: 'https://github.com/Sib07/terminaltask.git']]])
-                    // Add any Maven build commands if needed
-                    sh 'mvn clean install'
+                    checkout([$class: 'GitSCM', branches: [[name: 'main']], userRemoteConfigs: [[url: GIT_REPO_URL]]])
                 }
             }
         }
@@ -19,7 +23,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    bat "docker build -t saba7794/my-web-app:0.1 ."
+                    bat "docker build -t ${DOCKER_IMAGE_NAME} ."
                 }
             }
         }
@@ -27,28 +31,12 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    withCredentials([string(credentialId: 'saba7794', variable: 'dockerhubpws')]) {
-                        bat "docker login -u saba7794 -p ${dockerhubpws}"
-                        bat "docker push saba7794/my-web-app:0.1"
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dckr_pat_9-vH-OvulaIIaNccVkIwIGddXI4', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
+                        // Use double quotes for variable substitution
+                        bat "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
+                        bat "docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPO}:${BUILD_NUMBER}"
+                        bat "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPO}:${BUILD_NUMBER}"
                     }
-                }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                script {
-                    // Add your specific test commands
-                    echo 'Testing the Docker image...'
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    // Add deployment steps as needed
-                    echo 'Deploying the Docker image...'
                 }
             }
         }
@@ -56,17 +44,14 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline succeeded!'
-            emailext subject: "Pipeline Succeeded: ${currentBuild.fullDisplayName}",
-                      body: "The pipeline has succeeded.",
-                      to: "snaz5894@gmail.com"
+            emailext body: "Build passed.\n\n${BUILD_URL}",
+                    subject: 'Build Successful',
+                    to: EMAIL_RECIPIENTS
         }
-
         failure {
-            echo 'Pipeline failed!'
-            emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                      body: "The pipeline has failed. Please check the logs.",
-                      to: "snaz5894@gmail.com"
+            emailext body: "Build failed.\n\n${BUILD_URL}",
+                    subject: 'Build Failed',
+                    to: EMAIL_RECIPIENTS
         }
     }
 }
