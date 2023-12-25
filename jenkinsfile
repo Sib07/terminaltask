@@ -8,7 +8,7 @@ pipeline {
         DOCKER_HUB_USERNAME = 'saba7794'
         DOCKER_HUB_REPO = 'my-web-app'
         DOCKER_HUB_PASSWORD = 'Hala@7890' // URL encoded password
-        EMAIL_RECIPIENTS = 'fa20-bse-041@cuiatk.edu.pk'
+        EMAIL_RECIPIENTS = 'snaz5894@gmail.com'
     }
 
     stages {
