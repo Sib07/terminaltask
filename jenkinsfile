@@ -39,7 +39,7 @@ pipeline {
             // Example post-build success actions
             emailext subject: "Pipeline Succeeded: ${currentBuild.fullDisplayName}",
                       body: "The pipeline has succeeded.",
-                      to: "your-team@example.com"
+                      to: "snaz5894@gmail.com"
         }
 
         failure {
@@ -47,7 +47,7 @@ pipeline {
             // Example post-build failure actions
             emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
                       body: "The pipeline has failed. Please check the logs.",
-                      to: "your-team@example.com"
+                      to: "snaz5894@gmail.com"
         }
     }
 }
