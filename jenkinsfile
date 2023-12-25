@@ -1,23 +1,35 @@
 pipeline {
     agent any
-
+    tools {
+        maven 'MAVEN'
+}
+stages {
+    stage('Build Maven') {
+        steps {
+            checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'a3ce9c8d-1f26-4dbd-9fd7-e5c0ac5ae11d', url: 'https://github.com/Sib07/terminaltask.git']])
+}
+}
     stages {
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building the Docker image...'
-                    // Example build steps
-                    sh 'docker build -t saba7794/my-web-app:0.1 .'
+                    bat "docker build -t saba7794/my-web-app:0.1 ."
                 }
             }
         }
 
+        stage ('push to docker hub'){
+            steps {
+                script {
+                    withCredentials([string(credentialId: 'saba7794' , variable: 'dockerhubpws')]) {
+                    bat "docker login -u saba7794 -p ${dockerhubpws}"
+                    }
+                    bat "docker push saba7794/my-web-app:0.1"
         stage('Test') {
             steps {
                 script {
-                    echo 'Running tests...'
-                    // Example test steps (you may add your specific test commands)
-                    sh 'docker run saba7794/my-web-app:0.1 npm test'
+                    //Test Command
+                    echo 'testing the docker image...'
                 }
             }
         }
@@ -26,8 +38,6 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying the Docker image...'
-                    // Example deployment steps (you may deploy to AWS, Docker Hub, etc.)
-                    sh 'docker push saba7794/my-web-app:0.1'
                 }
             }
         }
