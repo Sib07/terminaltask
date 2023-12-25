@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+ 
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    echo 'Building the Docker image...'
+                    // Example build steps
+                    sh 'docker build -t saba7794/my-web-app:latest .'
+                }
+            }
+        }
+ 
+        stage('Test') {
+            steps {
+                script {
+                    echo 'Running tests...'
+                    // Example test steps (you may add your specific test commands)
+                    sh 'docker run saba7794/my-web-app:latest npm test'
+                }
+            }
+        }
+ 
+        stage('Deploy') {
+            steps {
+                script {
+                    echo 'Deploying the Docker image...'
+                    // Example deployment steps (you may deploy to AWS, Docker Hub, etc.)
+                    sh 'docker push saba7794/my-web-app:0.1'
+                }
+            }
+        }
+    }
+ 
+    post {
+        success {
+            echo 'Pipeline succeeded!'
+            // Example post-build success actions
+            mail to: 'your-team@example.com', subject: 'Pipeline Succeeded', body: 'The pipeline has succeeded.'
+        }
+ 
+        failure {
+            echo 'Pipeline failed!'
+            // Example post-build failure actions
+            mail to: 'your-team@example.com', subject: 'Pipeline Failed', body: 'The pipeline has failed. Please check the logs.'
+        }
+    }
+}
