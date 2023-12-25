@@ -7,7 +7,7 @@ pipeline {
                 script {
                     echo 'Building the Docker image...'
                     // Example build steps
-                    sh 'docker build -t saba7794/my-web-app:latest .'
+                    sh 'docker build -t saba7794/my-web-app:0.1 .'
                 }
             }
         }
@@ -17,7 +17,7 @@ pipeline {
                 script {
                     echo 'Running tests...'
                     // Example test steps (you may add your specific test commands)
-                    sh 'docker run saba7794/my-web-app:latest npm test'
+                    sh 'docker run saba7794/my-web-app:0.1 npm test'
                 }
             }
         }
